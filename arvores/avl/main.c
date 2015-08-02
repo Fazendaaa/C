@@ -21,6 +21,7 @@ int compare ( const void * key_1, const void * key_2 );
 static void ** alloc_ptr ( const int from, const int to );
 static void print_tree ( const BISTREE * bistree );
 
+/*  */
 int main ( int argc, char ** argv )
 {
     BISTREE *tree = NULL;
@@ -64,16 +65,19 @@ int main ( int argc, char ** argv )
     return 0;
 }
 
+/*  */
 void destoy ( void * data )
 {
     free ( data );
 }
 
+/*  */
 int compare ( const void * key_1, const void * key_2 )
 {
     return ( * ( ( int * ) key_1 ) - * ( ( int * ) key_2 ) );
 }
 
+/*  */
 static void ** alloc_ptr ( const int from, const int to )
 {
     void **new = NULL;
@@ -101,6 +105,7 @@ static void ** alloc_ptr ( const int from, const int to )
     return new;
 }
 
+/*  */
 static void recursive_print ( const BITREENODE * node  )
 {
     if ( node != NULL )
@@ -112,6 +117,7 @@ static void recursive_print ( const BITREENODE * node  )
     }
 }
 
+/*  */
 static void print_tree ( const BISTREE * bistree )
 {
     if ( bistree != NULL )
