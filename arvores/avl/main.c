@@ -13,8 +13,8 @@
 #define FROM_2 0
 #define TO_2   3
 
-#define FROM_3 0
-#define TO_3   5
+#define FROM_3 11
+#define TO_3   15
 
 void destoy ( void * data );
 int compare ( const void * key_1, const void * key_2 );
@@ -37,9 +37,6 @@ int main ( int argc, char ** argv )
 
     else
     {
-        /*for ( i = ( TO_1 - FROM_1 ); i >= 0; i-- )
-            bistree_insert ( tree, ptr_1[ i ] );*/
-
         for ( ; i < ( TO_1 - FROM_1 + 1 ); i++ )
             bistree_insert ( tree, ptr_1[ i ] );
 
@@ -49,8 +46,11 @@ int main ( int argc, char ** argv )
         for ( i = 0; i < ( TO_2 - FROM_2 + 1 ); i++ )
             bistree_insert ( tree, ptr_2[ i ] );
 
-        /*for ( i = TO_3 + 1; i > 0; i-- )
-            bistree_insert ( tree, ptr_3[ i ] );*/
+        printf ( "\n" );
+        print_tree ( tree );
+
+        for ( i = 0; i < ( TO_3 - FROM_3 + 1 ); i++ )
+            bistree_insert ( tree, ptr_3[ i ] );
 
         printf ( "\n" );
         print_tree ( tree );
@@ -107,6 +107,7 @@ static void recursive_print ( const BITREENODE * node  )
     {
         recursive_print ( node->left );
         recursive_print ( node->right );
+
         printf ( "Element data = %d\n", * ( ( int * ) bistree_avl_data( node ) ) );
     }
 }
