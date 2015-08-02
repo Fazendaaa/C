@@ -54,6 +54,11 @@ int main ( int argc, char ** argv )
 
         printf ( "\n" );
         print_tree ( tree );
+
+        bistree_destroy ( tree );
+        free ( ptr_3 );
+        free ( ptr_2 );
+        free ( ptr_1 );
     }
 
     return 0;

@@ -7,9 +7,31 @@
 #include "bistree.h"
 
 /*  */
+static void recursive_destroy ( BITREENODE * node, void ( * destroy ) ( void * data ) )
+{
+    if ( node != NULL )
+    {
+        recursive_destroy ( node->left, destroy );
+        recursive_destroy ( node->right, destroy );
+
+        /*  primeiro é leberado do dado alocado pelo usuário    */
+        destroy ( bistree_avl_data( node ) );
+        /*  logo em seguida, a estrutura AVL é liberada */
+        free ( bistree_avl( node ) );
+        /*  por último, se libera a estrutura de node da árvore */
+        free ( node );
+    }
+}
+
+/*  */
 void bistree_destroy ( BISTREE * bistree )
 {
+    if ( bistree != NULL )
+    {
+        recursive_destroy ( bistree->root, bistree->destroy );
 
+        free ( bistree );
+    }
 }
 
 /*  */
@@ -141,31 +163,17 @@ static BITREENODE * verifiy_balance ( BITREENODE * node )
     balance = get_height ( node );
     bistree_avl_height( node ) = balance;
 
-    printf ( "DATA = %d | BALANCE = %d\n", * ( ( int * ) bistree_avl_data( node ) ), balance );
-
     if ( balance == AVL_RR_ROTATE )
-    {
-        printf ( "Rotate right right\n" );
         return rotate_right ( node );
-    }
 
     else if ( balance == AVL_LL_ROTATE )
-    {
-        printf ( "Rotate left left\n" );
         return rotate_left ( node );
-    }
 
     else if ( balance == AVL_LR_ROTATE )
-    {
-        printf ( "Rotate left right\n" );
         return rotate_left_right ( node );
-    }
 
     else if ( balance == AVL_RL_ROTATE )
-    {
-        printf ( "Rotate right left\n" );
         return rotate_right_left ( node );
-    }
 
     /*  caso  não  precise  rotacionar  para  nenhum  lado,  o  valor  do node é
         alterado e ele é simplesmente retornado
@@ -232,13 +240,7 @@ int bistree_insert ( BISTREE * bistree, void * data )
 }
 
 /*  */
-int bistree_remove ( BISTREE * bistree, void * data )
-{
-    return ERROR;
-}
-
-/*  */
-static void * recursive_lookup ( BISTREE * bistree, BITREENODE * node, void * data )
+static AVLNODE * recursive_remove ( BISTREE * bistree, BITREENODE * node, void * data )
 {
     int balance = 0;
 
@@ -247,23 +249,55 @@ static void * recursive_lookup ( BISTREE * bistree, BITREENODE * node, void * da
         balance = bistree->compare ( node->data, data );
 
         if ( balance < 0 )
-            return recursive_lookup ( bistree, node->right, data );
+            return recursive_remove ( bistree, node->right, data );
 
         else if ( balance > 0 )
-            return recursive_lookup ( bistree, node->left, data );
+            return recursive_remove ( bistree, node->left, data );
 
         /*  o  elmento  já  se  encontra  presente na árovre -- se o elemento se
             encontra  presente  mas  fora  removido  logicamente,  não  irá  ser
             retornado e, neste caso, se retorna nulo
         */
         else
-            return ( bistree_avl_hidden( node ) == SHOW ) ? bistree_avl_data( node ) : NULL;
+            return ( bistree_avl_hidden( node ) == SHOW ) ? bistree_avl( node ) : NULL;
     }
 
     /*  se  node  for  nulo  --  ou  seja,  onde  possivelmente se encontraria o
         não está presente na árvore
     */
     return NULL;
+}
+
+/*  */
+int bistree_remove ( BISTREE * bistree, void * data )
+{
+    AVLNODE *avl = NULL;
+
+    if ( ( bistree != NULL ) && ( data != NULL ) && ( bistree_lookup ( bistree, data ) != NULL ) )
+    {
+        avl = recursive_remove ( bistree, bistree->root, data );
+
+        /*  não  vai  ser  porque o "bistree_lookup" já foi invocado; todavia, a
+            verificação não custa muito, o que torna vivável fazê-la
+        */
+        if ( avl != NULL )
+        {
+            /*  a remoção é apenas lógica   */
+            avl_hidden( avl ) = HIDE;
+
+            return SUCESS;
+        }
+    }
+
+    return ERROR;
+}
+
+/*  */
+static void * recursive_lookup ( BISTREE * bistree, BITREENODE * node, void * data )
+{
+    AVLNODE *avl = NULL;
+
+    return ( ( ( avl = recursive_remove ( bistree, node, data ) ) != NULL ) ? avl_data( avl ) : avl );
 }
 
 /*  */
