@@ -15,7 +15,10 @@ HEAP * heap_initialize ( int ( * compare ) ( const void * key_1, const void * ke
 
     if ( ( heap = malloc ( sizeof ( HEAP ) ) ) != NULL )
     {
+        heap->compare = compare;
+        heap->destroy = destroy;
 
+        heap_size( heap ) = 0;
     }
 
     return heap;
@@ -24,9 +27,12 @@ HEAP * heap_initialize ( int ( * compare ) ( const void * key_1, const void * ke
 /*  */
 void heap_destroy ( HEAP * heap )
 {
+    unsigned int i = 0;
+
     if ( heap != NULL )
     {
-
+        for ( ; i < heap_size( heap ); i++ )
+            heap->destroy ( heap->tree[ i ] );
     }
 }
 
